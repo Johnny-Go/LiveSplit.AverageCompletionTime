@@ -1,5 +1,6 @@
 ﻿using LiveSplit.Extensions;
 using LiveSplit.Model;
+using LiveSplit.Model.Comparisons;
 using LiveSplit.TimeFormatters;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,10 @@ namespace LiveSplit.UI.Components
         private TimingMethod PreviousTimingMethod { get; set; }
         private RegularAverageCompletionTimeTimeFormatter Formatter { get; set; }
         private int LatestCompleted { get; set; }
+        private bool UseLatest { get; set; }
+        private bool UseAverageComparison { get; set; }
         private bool UseAllRuns { get; set; }
+        private AverageSegmentsComparisonGenerator AverageComparison { get; set; }
 
         private TimeSpan? AverageCompletionTimeValue { get; set; }
 
@@ -48,6 +52,8 @@ namespace LiveSplit.UI.Components
             Settings = new AverageCompletionTimeSettings(state);
             Settings.SettingsChanged += Settings_SettingsChanged;
             LatestCompleted = Settings.LatestCompleted;
+            UseLatest = Settings.UseLatest;
+            UseAverageComparison = Settings.UseAverageComparison;
             UseAllRuns = Settings.UseAllRuns;
             state.OnSplit += state_OnSplit;
             state.OnUndoSplit += state_OnUndoSplit;
@@ -85,29 +91,41 @@ namespace LiveSplit.UI.Components
         private void UpdateAverageCompletionTime(LiveSplitState state)
         {
             LatestCompleted = Settings.LatestCompleted;
+            UseLatest = Settings.UseLatest;
+            UseAverageComparison = Settings.UseAverageComparison;
             UseAllRuns = Settings.UseAllRuns;
 
             var method = state.CurrentTimingMethod;
             var run = state.Run;
 
-            IEnumerable<TimeSpan?> completedRuns;
-            if (method == TimingMethod.GameTime)
+            if (UseLatest || UseAllRuns)
             {
-                completedRuns = run.AttemptHistory.Where(h => h.Time.GameTime != null).Select(h => h.Time.GameTime);
+                AverageComparison = new AverageSegmentsComparisonGenerator(state.Run);
+                AverageComparison.Generate(method);
+
+                IEnumerable<TimeSpan?> completedRuns;
+                if (method == TimingMethod.GameTime)
+                {
+                    completedRuns = run.AttemptHistory.Where(h => h.Time.GameTime != null).Select(h => h.Time.GameTime);
+                }
+                else
+                {
+                    completedRuns = run.AttemptHistory.Where(h => h.Time.RealTime != null).Select(h => h.Time.RealTime);
+                }
+
+                if (!UseAllRuns)
+                {
+                    completedRuns = completedRuns.TakeLast(LatestCompleted);
+                }
+
+                var totalTime = completedRuns.Aggregate((s, a) => s + a);
+                AverageCompletionTimeValue = TimeSpan.FromSeconds(totalTime.Value.TotalSeconds / completedRuns.Count());
             }
-            else
+            else if (UseAverageComparison)
             {
-                completedRuns = run.AttemptHistory.Where(h => h.Time.RealTime != null).Select(h => h.Time.RealTime);
+                AverageCompletionTimeValue = AverageComparison.Run[run.Count - 1].Comparisons["Average Segments"][method];
             }
 
-            if (!UseAllRuns)
-            {
-                completedRuns = completedRuns.TakeLast(LatestCompleted);
-            }
-
-            var totalTime = completedRuns.Aggregate((s, a) => s + a);
-
-            AverageCompletionTimeValue = TimeSpan.FromSeconds(totalTime.Value.TotalSeconds / completedRuns.Count());
             PreviousTimingMethod = state.CurrentTimingMethod;
         }
 

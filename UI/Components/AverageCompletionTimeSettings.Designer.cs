@@ -54,9 +54,11 @@
             this.chkTwoRows = new System.Windows.Forms.CheckBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
-            this.chkUseAllRuns = new System.Windows.Forms.CheckBox();
+            this.rdoUseAvgComp = new System.Windows.Forms.RadioButton();
             this.label4 = new System.Windows.Forms.Label();
             this.nudLatestCompleted = new System.Windows.Forms.NumericUpDown();
+            this.rdoUseAllRuns = new System.Windows.Forms.RadioButton();
+            this.rdoUseLatest = new System.Windows.Forms.RadioButton();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -403,13 +405,15 @@
             // 
             // tableLayoutPanel6
             // 
-            this.tableLayoutPanel6.ColumnCount = 2;
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22.44444F));
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 77.55556F));
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 258F));
+            this.tableLayoutPanel6.ColumnCount = 3;
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 48.5623F));
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 51.4377F));
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 138F));
+            this.tableLayoutPanel6.Controls.Add(this.rdoUseAvgComp, 1, 0);
             this.tableLayoutPanel6.Controls.Add(this.label4, 0, 1);
             this.tableLayoutPanel6.Controls.Add(this.nudLatestCompleted, 1, 1);
-            this.tableLayoutPanel6.Controls.Add(this.chkUseAllRuns, 0, 0);
+            this.tableLayoutPanel6.Controls.Add(this.rdoUseAllRuns, 2, 0);
+            this.tableLayoutPanel6.Controls.Add(this.rdoUseLatest, 0, 0);
             this.tableLayoutPanel6.Location = new System.Drawing.Point(3, 19);
             this.tableLayoutPanel6.Name = "tableLayoutPanel6";
             this.tableLayoutPanel6.RowCount = 2;
@@ -418,36 +422,34 @@
             this.tableLayoutPanel6.Size = new System.Drawing.Size(450, 58);
             this.tableLayoutPanel6.TabIndex = 0;
             // 
-            // chkUseAllRuns
+            // rdoUseAvgComp
             // 
-            this.chkUseAllRuns.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.chkUseAllRuns.AutoSize = true;
-            this.tableLayoutPanel6.SetColumnSpan(this.chkUseAllRuns, 3);
-            this.chkUseAllRuns.Location = new System.Drawing.Point(7, 6);
-            this.chkUseAllRuns.Margin = new System.Windows.Forms.Padding(7, 3, 3, 3);
-            this.chkUseAllRuns.Name = "chkUseAllRuns";
-            this.chkUseAllRuns.Size = new System.Drawing.Size(440, 17);
-            this.chkUseAllRuns.TabIndex = 4;
-            this.chkUseAllRuns.Text = "Use All Runs";
-            this.toolTip1.SetToolTip(this.chkUseAllRuns, "If checked uses all completed runs for average");
-            this.chkUseAllRuns.UseVisualStyleBackColor = true;
-            this.chkUseAllRuns.CheckedChanged += new System.EventHandler(this.chkUseAllRuns_CheckedChanged);
+            this.rdoUseAvgComp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.rdoUseAvgComp.Location = new System.Drawing.Point(154, 3);
+            this.rdoUseAvgComp.Name = "rdoUseAvgComp";
+            this.rdoUseAvgComp.Size = new System.Drawing.Size(154, 23);
+            this.rdoUseAvgComp.TabIndex = 1;
+            this.rdoUseAvgComp.TabStop = true;
+            this.rdoUseAvgComp.Text = "Use Average Comparison";
+            this.toolTip1.SetToolTip(this.rdoUseAvgComp, "Uses the default LiveSplit Average Comparison.");
+            this.rdoUseAvgComp.UseVisualStyleBackColor = true;
+            //this.rdoUseAvgComp.CheckedChanged += new System.EventHandler(this.rdoUseAvgComp_CheckedChanged);
+            this.rdoUseAvgComp.Click += new System.EventHandler(this.rdoComparisonGroup_Click);
             // 
             // label4
             // 
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(3, 37);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(94, 13);
+            this.label4.Size = new System.Drawing.Size(145, 13);
             this.label4.TabIndex = 2;
             this.label4.Text = "Latest Completed:";
-            this.toolTip1.SetToolTip(this.label4, "Use the X most recent completed runs for average");
             // 
             // nudLatestCompleted
             // 
             this.nudLatestCompleted.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.nudLatestCompleted.Location = new System.Drawing.Point(103, 33);
+            this.tableLayoutPanel6.SetColumnSpan(this.nudLatestCompleted, 2);
+            this.nudLatestCompleted.Location = new System.Drawing.Point(154, 33);
             this.nudLatestCompleted.Maximum = new decimal(new int[] {
             2147483647,
             0,
@@ -459,7 +461,7 @@
             0,
             0});
             this.nudLatestCompleted.Name = "nudLatestCompleted";
-            this.nudLatestCompleted.Size = new System.Drawing.Size(344, 20);
+            this.nudLatestCompleted.Size = new System.Drawing.Size(293, 20);
             this.nudLatestCompleted.TabIndex = 3;
             this.nudLatestCompleted.Value = new decimal(new int[] {
             100,
@@ -467,6 +469,35 @@
             0,
             0});
             this.nudLatestCompleted.ValueChanged += new System.EventHandler(this.nudLatestCompleted_ValueChanged);
+            // 
+            // rdoUseAllRuns
+            // 
+            this.rdoUseAllRuns.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.rdoUseAllRuns.Location = new System.Drawing.Point(314, 3);
+            this.rdoUseAllRuns.Name = "rdoUseAllRuns";
+            this.rdoUseAllRuns.Size = new System.Drawing.Size(133, 23);
+            this.rdoUseAllRuns.TabIndex = 5;
+            this.rdoUseAllRuns.TabStop = true;
+            this.rdoUseAllRuns.Text = "Use All Runs";
+            this.toolTip1.SetToolTip(this.rdoUseAllRuns, "Uses all completed runs for average.");
+            this.rdoUseAllRuns.UseVisualStyleBackColor = true;
+            //this.rdoUseAllRuns.CheckedChanged += new System.EventHandler(this.rdoUseAllRuns_CheckedChanged);
+            this.rdoUseAllRuns.Click += new System.EventHandler(this.rdoComparisonGroup_Click);
+            // 
+            // rdoUseLatest
+            // 
+            this.rdoUseLatest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.rdoUseLatest.AutoSize = true;
+            this.rdoUseLatest.Location = new System.Drawing.Point(3, 6);
+            this.rdoUseLatest.Name = "rdoUseLatest";
+            this.rdoUseLatest.Size = new System.Drawing.Size(145, 17);
+            this.rdoUseLatest.TabIndex = 6;
+            this.rdoUseLatest.TabStop = true;
+            this.rdoUseLatest.Text = "Use Latest Completed";
+            this.toolTip1.SetToolTip(this.rdoUseLatest, "Uses the X most recent completed runs for average.");
+            this.rdoUseLatest.UseVisualStyleBackColor = true;
+            //this.rdoUseLatest.CheckedChanged += new System.EventHandler(this.rdoUseLatest_CheckedChanged);
+            this.rdoUseLatest.Click += new System.EventHandler(this.rdoComparisonGroup_Click);
             // 
             // AverageCompletionTimeSettings
             // 
@@ -527,7 +558,9 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.NumericUpDown nudLatestCompleted;
-        private System.Windows.Forms.CheckBox chkUseAllRuns;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.RadioButton rdoUseAvgComp;
+        private System.Windows.Forms.RadioButton rdoUseAllRuns;
+        private System.Windows.Forms.RadioButton rdoUseLatest;
     }
 }

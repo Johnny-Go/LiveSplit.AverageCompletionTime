@@ -31,7 +31,9 @@ namespace LiveSplit.UI.Components
         public LayoutMode Mode { get; set; }
         
         public int LatestCompleted { get; set; }
+        public bool UseLatest { get; set; }
         public bool UseAllRuns { get; set; }
+        public bool UseAverageComparison { get; set; }
 
         public event EventHandler SettingsChanged;
 
@@ -51,11 +53,14 @@ namespace LiveSplit.UI.Components
             BackgroundGradient = GradientType.Plain;
             Display2Rows = false;
             UseAllRuns = false;
-
+            UseLatest = true;
+            UseAverageComparison = false;
             LatestCompleted = 100;
             
             nudLatestCompleted.DataBindings.Add("Value", this, "LatestCompleted", false, DataSourceUpdateMode.OnPropertyChanged);
-            chkUseAllRuns.DataBindings.Add("Checked", this, "UseAllRuns", false, DataSourceUpdateMode.OnPropertyChanged);
+            rdoUseLatest.DataBindings.Add("Checked", this, "UseLatest", false, DataSourceUpdateMode.OnPropertyChanged);
+            rdoUseAllRuns.DataBindings.Add("Checked", this, "UseAllRuns", false, DataSourceUpdateMode.OnPropertyChanged);
+            rdoUseAvgComp.DataBindings.Add("Checked", this, "UseAverageComparison", false, DataSourceUpdateMode.OnPropertyChanged);
             chkOverrideTextColor.DataBindings.Add("Checked", this, "OverrideTextColor", false, DataSourceUpdateMode.OnPropertyChanged);
             btnTextColor.DataBindings.Add("BackColor", this, "TextColor", false, DataSourceUpdateMode.OnPropertyChanged);
             chkOverrideTimeColor.DataBindings.Add("Checked", this, "OverrideTimeColor", false, DataSourceUpdateMode.OnPropertyChanged);
@@ -130,12 +135,49 @@ namespace LiveSplit.UI.Components
             SettingsChanged(this, null);
         }
 
-        private void chkUseAllRuns_CheckedChanged(object sender, EventArgs e)
+        private void rdoUseLatest_CheckedChanged(object sender, EventArgs e)
         {
-            label4.Enabled = !chkUseAllRuns.Checked;
-            nudLatestCompleted.Enabled = !chkUseAllRuns.Checked;
-            UseAllRuns = chkUseAllRuns.Checked;
+            UpdateSettingsRadio();
+        }
+
+        private void rdoUseAvgComp_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateSettingsRadio();
+        }
+
+        private void rdoUseAllRuns_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateSettingsRadio();
+        }
+
+        private void UpdateSettingsRadio()
+        {
+            if (rdoUseLatest.Checked)
+            {
+                label4.Enabled = true;
+                nudLatestCompleted.Enabled = true;
+            }
+            else
+            {
+                label4.Enabled = false;
+                nudLatestCompleted.Enabled = false;
+            }
+
+            UseLatest = rdoUseLatest.Checked;
+            UseAverageComparison = rdoUseAvgComp.Checked;
+            UseAllRuns = rdoUseAllRuns.Checked;
+
             SettingsChanged(this, null);
+        }
+
+        private void rdoComparisonGroup_Click(object sender, EventArgs e)
+        {
+            var rb = sender as RadioButton;
+            if (rb != null && !rb.Checked)
+            {
+                rb.Checked = true;
+            }
+            UpdateSettingsRadio();
         }
 
         public void SetSettings(XmlNode node)
@@ -152,6 +194,8 @@ namespace LiveSplit.UI.Components
             GradientString = SettingsHelper.ParseString(element["BackgroundGradient"]);
             Display2Rows = SettingsHelper.ParseBool(element["Display2Rows"], false);
             UseAllRuns = SettingsHelper.ParseBool(element["UseAllRuns"], false);
+            UseAverageComparison = SettingsHelper.ParseBool(element["UseAverageComparison"], false);
+            UseLatest = SettingsHelper.ParseBool(element["UseLatest"], false);
         }
 
         public XmlNode GetSettings(XmlDocument document)
@@ -179,6 +223,8 @@ namespace LiveSplit.UI.Components
             SettingsHelper.CreateSetting(document, parent, "BackgroundGradient", BackgroundGradient) ^
             SettingsHelper.CreateSetting(document, parent, "Display2Rows", Display2Rows) ^
             SettingsHelper.CreateSetting(document, parent, "UseAllRuns", UseAllRuns) ^
+            SettingsHelper.CreateSetting(document, parent, "UseAverageComparison", UseAverageComparison) ^
+            SettingsHelper.CreateSetting(document, parent, "UseLatest", UseLatest) ^
             SettingsHelper.CreateSetting(document, parent, "LatestCompleted", LatestCompleted);
         }
 
