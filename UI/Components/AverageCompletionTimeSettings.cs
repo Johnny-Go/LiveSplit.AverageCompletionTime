@@ -9,8 +9,6 @@ namespace LiveSplit.UI.Components
 {
     public partial class AverageCompletionTimeSettings : UserControl
     {
-        public LiveSplitState CurrentState { get; set; }
-
         public Color TextColor { get; set; }
         public bool OverrideTextColor { get; set; }
         public Color TimeColor { get; set; }
@@ -41,8 +39,6 @@ namespace LiveSplit.UI.Components
         {
             InitializeComponent();
 
-            CurrentState = state;
-
             TextColor = Color.FromArgb(255, 255, 255);
             OverrideTextColor = false;
             TimeColor = Color.FromArgb(255, 255, 255);
@@ -52,8 +48,8 @@ namespace LiveSplit.UI.Components
             BackgroundColor2 = Color.Transparent;
             BackgroundGradient = GradientType.Plain;
             Display2Rows = false;
-            UseAllRuns = false;
             UseLatest = true;
+            UseAllRuns = false;          
             UseAverageComparison = false;
             LatestCompleted = 100;
             
@@ -70,17 +66,17 @@ namespace LiveSplit.UI.Components
             cmbGradientType.DataBindings.Add("SelectedItem", this, "GradientString", false, DataSourceUpdateMode.OnPropertyChanged);
         }
 
-        void chkOverrideTimeColor_CheckedChanged(object sender, EventArgs e)
+        private void chkOverrideTimeColor_CheckedChanged(object sender, EventArgs e)
         {
             label2.Enabled = btnTimeColor.Enabled = chkOverrideTimeColor.Checked;
         }
 
-        void chkOverrideTextColor_CheckedChanged(object sender, EventArgs e)
+        private void chkOverrideTextColor_CheckedChanged(object sender, EventArgs e)
         {
             label1.Enabled = btnTextColor.Enabled = chkOverrideTextColor.Checked;
         }
 
-        void AverageCompletionTimeSettings_Load(object sender, EventArgs e)
+        private void AverageCompletionTimeSettings_Load(object sender, EventArgs e)
         {
             chkOverrideTextColor_CheckedChanged(null, null);
             chkOverrideTimeColor_CheckedChanged(null, null);
@@ -101,7 +97,7 @@ namespace LiveSplit.UI.Components
             }
         }
 
-        void cmbGradientType_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbGradientType_SelectedIndexChanged(object sender, EventArgs e)
         {
             btnColor1.Visible = cmbGradientType.SelectedItem.ToString() != "Plain";
             btnColor2.DataBindings.Clear();
@@ -109,30 +105,40 @@ namespace LiveSplit.UI.Components
             GradientString = cmbGradientType.SelectedItem.ToString();
         }
 
-        void rdoHundredths_CheckedChanged(object sender, EventArgs e)
+        private void rdoAccuracyGroup_Click(object sender, EventArgs e)
         {
+            var rb = sender as RadioButton;
+            if (rb != null && !rb.Checked)
+            {
+                rb.Checked = true;
+            }
             UpdateAccuracy();
         }
 
-        void rdoSeconds_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateAccuracy();
-        }
-
-        void UpdateAccuracy()
+        private void UpdateAccuracy()
         {
             if (rdoSeconds.Checked)
+            {
                 Accuracy = TimeAccuracy.Seconds;
+            }
             else if (rdoTenths.Checked)
+            {
                 Accuracy = TimeAccuracy.Tenths;
+            }
             else
+            {
                 Accuracy = TimeAccuracy.Hundredths;
+            }
         }
 
-        void nudLatestCompleted_ValueChanged(object sender, EventArgs e)
+        private void rdoComparisonGroup_Click(object sender, EventArgs e)
         {
-            LatestCompleted = (int)nudLatestCompleted.Value;
-            SettingsChanged(this, null);
+            var rb = sender as RadioButton;
+            if (rb != null && !rb.Checked)
+            {
+                rb.Checked = true;
+            }
+            UpdateSettingsRadio();
         }
 
         private void UpdateSettingsRadio()
@@ -155,14 +161,10 @@ namespace LiveSplit.UI.Components
             SettingsChanged(this, null);
         }
 
-        private void rdoComparisonGroup_Click(object sender, EventArgs e)
+        private void nudLatestCompleted_ValueChanged(object sender, EventArgs e)
         {
-            var rb = sender as RadioButton;
-            if (rb != null && !rb.Checked)
-            {
-                rb.Checked = true;
-            }
-            UpdateSettingsRadio();
+            LatestCompleted = (int)nudLatestCompleted.Value;
+            SettingsChanged(this, null);
         }
 
         public void SetSettings(XmlNode node)

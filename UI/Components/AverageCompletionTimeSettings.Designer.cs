@@ -235,7 +235,7 @@
             this.rdoSeconds.TabStop = true;
             this.rdoSeconds.Text = "Seconds";
             this.rdoSeconds.UseVisualStyleBackColor = true;
-            this.rdoSeconds.CheckedChanged += new System.EventHandler(this.rdoSeconds_CheckedChanged);
+            this.rdoSeconds.Click += new System.EventHandler(this.rdoAccuracyGroup_Click);
             // 
             // rdoTenths
             // 
@@ -248,6 +248,7 @@
             this.rdoTenths.TabStop = true;
             this.rdoTenths.Text = "Tenths";
             this.rdoTenths.UseVisualStyleBackColor = true;
+            this.rdoTenths.Click += new System.EventHandler(this.rdoAccuracyGroup_Click);
             // 
             // rdoHundredths
             // 
@@ -260,7 +261,7 @@
             this.rdoHundredths.TabStop = true;
             this.rdoHundredths.Text = "Hundredths";
             this.rdoHundredths.UseVisualStyleBackColor = true;
-            this.rdoHundredths.CheckedChanged += new System.EventHandler(this.rdoHundredths_CheckedChanged);
+            this.rdoHundredths.Click += new System.EventHandler(this.rdoAccuracyGroup_Click);
             // 
             // groupBox3
             // 

@@ -14,19 +14,6 @@ namespace LiveSplit.UI.Components
 {
     public class AverageCompletionTimeComponent : IComponent
     {
-        protected InfoTimeComponent InternalComponent { get; set; }
-        public AverageCompletionTimeSettings Settings { get; set; }
-        private LiveSplitState CurrentState { get; set; }
-        private TimingMethod PreviousTimingMethod { get; set; }
-        private RegularAverageCompletionTimeTimeFormatter Formatter { get; set; }
-        private int LatestCompleted { get; set; }
-        private bool UseLatest { get; set; }
-        private bool UseAverageComparison { get; set; }
-        private bool UseAllRuns { get; set; }
-        private AverageSegmentsComparisonGenerator AverageComparison { get; set; }
-
-        private TimeSpan? AverageCompletionTimeValue { get; set; }
-
         public string ComponentName => "Average Completion Time";
         public float HorizontalWidth => InternalComponent.HorizontalWidth;
         public float MinimumHeight => InternalComponent.MinimumHeight;
@@ -37,6 +24,14 @@ namespace LiveSplit.UI.Components
         public float PaddingLeft => InternalComponent.PaddingLeft;
         public float PaddingRight => InternalComponent.PaddingRight;
         public IDictionary<string, Action> ContextMenuControls => null;
+
+        private InfoTimeComponent InternalComponent { get; set; }
+        private AverageCompletionTimeSettings Settings { get; set; }
+        private LiveSplitState CurrentState { get; set; }
+        private TimingMethod PreviousTimingMethod { get; set; }
+        private RegularAverageCompletionTimeTimeFormatter Formatter { get; set; }
+        private AverageSegmentsComparisonGenerator AverageComparison { get; set; }
+        private TimeSpan? AverageCompletionTimeValue { get; set; }
 
         public AverageCompletionTimeComponent(LiveSplitState state)
         {
@@ -50,20 +45,15 @@ namespace LiveSplit.UI.Components
                 }
             };
             Settings = new AverageCompletionTimeSettings(state);
-            Settings.SettingsChanged += Settings_SettingsChanged;
-            LatestCompleted = Settings.LatestCompleted;
-            UseLatest = Settings.UseLatest;
-            UseAverageComparison = Settings.UseAverageComparison;
-            UseAllRuns = Settings.UseAllRuns;
-            state.OnSplit += state_OnSplit;
-            state.OnUndoSplit += state_OnUndoSplit;
+            Settings.SettingsChanged += settings_SettingsChanged;
             state.OnReset += state_OnReset;
             CurrentState = state;
-            CurrentState.RunManuallyModified += CurrentState_RunModified;
-            UpdateAverageCompletionTime(state);
+            AverageComparison = new AverageSegmentsComparisonGenerator(state.Run);
+
+            UpdateAverageCompletionTime(state);          
         }
 
-        void Settings_SettingsChanged(object sender, EventArgs e)
+        private void settings_SettingsChanged(object sender, EventArgs e)
         {
             UpdateAverageCompletionTime(CurrentState);
         }
@@ -73,36 +63,13 @@ namespace LiveSplit.UI.Components
             UpdateAverageCompletionTime((LiveSplitState)sender);
         }
 
-        private void state_OnUndoSplit(object sender, EventArgs e)
-        {
-            UpdateAverageCompletionTime((LiveSplitState)sender);
-        }
-
-        private void state_OnSplit(object sender, EventArgs e)
-        {
-            UpdateAverageCompletionTime((LiveSplitState)sender);
-        }
-
-        private void CurrentState_RunModified(object sender, EventArgs e)
-        {
-            UpdateAverageCompletionTime(CurrentState);
-        }
-
         private void UpdateAverageCompletionTime(LiveSplitState state)
         {
-            LatestCompleted = Settings.LatestCompleted;
-            UseLatest = Settings.UseLatest;
-            UseAverageComparison = Settings.UseAverageComparison;
-            UseAllRuns = Settings.UseAllRuns;
-
             var method = state.CurrentTimingMethod;
             var run = state.Run;
 
-            if (UseLatest || UseAllRuns)
+            if (Settings.UseLatest || Settings.UseAllRuns)
             {
-                AverageComparison = new AverageSegmentsComparisonGenerator(state.Run);
-                AverageComparison.Generate(method);
-
                 IEnumerable<TimeSpan?> completedRuns;
                 if (method == TimingMethod.GameTime)
                 {
@@ -113,16 +80,20 @@ namespace LiveSplit.UI.Components
                     completedRuns = run.AttemptHistory.Where(h => h.Time.RealTime != null).Select(h => h.Time.RealTime);
                 }
 
-                if (!UseAllRuns)
+                if (!Settings.UseAllRuns)
                 {
-                    completedRuns = completedRuns.TakeLast(LatestCompleted);
+                    completedRuns = completedRuns.TakeLast(Settings.LatestCompleted);
                 }
 
-                var totalTime = completedRuns.Aggregate((s, a) => s + a);
-                AverageCompletionTimeValue = TimeSpan.FromSeconds(totalTime.Value.TotalSeconds / completedRuns.Count());
+                var totalTime = completedRuns.DefaultIfEmpty().Aggregate((s, a) => s + a);
+                if (totalTime.HasValue)
+                {
+                    AverageCompletionTimeValue = TimeSpan.FromSeconds(totalTime.Value.TotalSeconds / completedRuns.Count());
+                }
             }
-            else if (UseAverageComparison)
-            {
+            else if (Settings.UseAverageComparison)
+            {               
+                AverageComparison.Generate(method);
                 AverageCompletionTimeValue = AverageComparison.Run[run.Count - 1].Comparisons["Average Segments"][method];
             }
 
@@ -135,15 +106,16 @@ namespace LiveSplit.UI.Components
                 || Settings.BackgroundGradient != GradientType.Plain
                 && Settings.BackgroundColor2.A > 0)
             {
-                var gradientBrush = new LinearGradientBrush(
-                            new PointF(0, 0),
-                            Settings.BackgroundGradient == GradientType.Horizontal
-                            ? new PointF(width, 0)
-                            : new PointF(0, height),
-                            Settings.BackgroundColor,
-                            Settings.BackgroundGradient == GradientType.Plain
-                            ? Settings.BackgroundColor
-                            : Settings.BackgroundColor2);
+                var gradientBrush = new LinearGradientBrush (
+                    new PointF(0, 0),
+                    Settings.BackgroundGradient == GradientType.Horizontal
+                        ? new PointF(width, 0)
+                        : new PointF(0, height),
+                    Settings.BackgroundColor,
+                    Settings.BackgroundGradient == GradientType.Plain
+                        ? Settings.BackgroundColor
+                        : Settings.BackgroundColor2);
+
                 g.FillRectangle(gradientBrush, 0, 0, width, height);
             }
         }
@@ -221,8 +193,6 @@ namespace LiveSplit.UI.Components
 
         public void Dispose()
         {
-            CurrentState.OnSplit -= state_OnSplit;
-            CurrentState.OnUndoSplit -= state_OnUndoSplit;
             CurrentState.OnReset -= state_OnReset;
         }
 
