@@ -135,21 +135,6 @@ namespace LiveSplit.UI.Components
             SettingsChanged(this, null);
         }
 
-        private void rdoUseLatest_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateSettingsRadio();
-        }
-
-        private void rdoUseAvgComp_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateSettingsRadio();
-        }
-
-        private void rdoUseAllRuns_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateSettingsRadio();
-        }
-
         private void UpdateSettingsRadio()
         {
             if (rdoUseLatest.Checked)

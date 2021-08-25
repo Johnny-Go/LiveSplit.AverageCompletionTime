@@ -433,7 +433,6 @@
             this.rdoUseAvgComp.Text = "Use Average Comparison";
             this.toolTip1.SetToolTip(this.rdoUseAvgComp, "Uses the default LiveSplit Average Comparison.");
             this.rdoUseAvgComp.UseVisualStyleBackColor = true;
-            //this.rdoUseAvgComp.CheckedChanged += new System.EventHandler(this.rdoUseAvgComp_CheckedChanged);
             this.rdoUseAvgComp.Click += new System.EventHandler(this.rdoComparisonGroup_Click);
             // 
             // label4
@@ -481,7 +480,6 @@
             this.rdoUseAllRuns.Text = "Use All Runs";
             this.toolTip1.SetToolTip(this.rdoUseAllRuns, "Uses all completed runs for average.");
             this.rdoUseAllRuns.UseVisualStyleBackColor = true;
-            //this.rdoUseAllRuns.CheckedChanged += new System.EventHandler(this.rdoUseAllRuns_CheckedChanged);
             this.rdoUseAllRuns.Click += new System.EventHandler(this.rdoComparisonGroup_Click);
             // 
             // rdoUseLatest
@@ -496,7 +494,6 @@
             this.rdoUseLatest.Text = "Use Latest Completed";
             this.toolTip1.SetToolTip(this.rdoUseLatest, "Uses the X most recent completed runs for average.");
             this.rdoUseLatest.UseVisualStyleBackColor = true;
-            //this.rdoUseLatest.CheckedChanged += new System.EventHandler(this.rdoUseLatest_CheckedChanged);
             this.rdoUseLatest.Click += new System.EventHandler(this.rdoComparisonGroup_Click);
             // 
             // AverageCompletionTimeSettings
