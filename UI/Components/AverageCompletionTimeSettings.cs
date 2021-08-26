@@ -89,6 +89,11 @@ namespace LiveSplit.UI.Components
             rdoSeconds.Checked = Accuracy == TimeAccuracy.Seconds;
             rdoTenths.Checked = Accuracy == TimeAccuracy.Tenths;
             rdoHundredths.Checked = Accuracy == TimeAccuracy.Hundredths;
+            nudLatestCompleted.Value = LatestCompleted;
+            rdoUseLatest.Checked = UseLatest;
+            rdoUseAvgComp.Checked = UseAverageComparison;
+            rdoUseAllRuns.Checked = UseAllRuns;
+            rdoComparisonGroup_Click(null, null);
             if (Mode == LayoutMode.Horizontal)
             {
                 chkTwoRows.Enabled = false;
