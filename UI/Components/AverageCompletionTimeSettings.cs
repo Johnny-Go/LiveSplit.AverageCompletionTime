@@ -20,8 +20,14 @@ namespace LiveSplit.UI.Components
         public GradientType BackgroundGradient { get; set; }
         public string GradientString
         {
-            get { return BackgroundGradient.ToString(); }
-            set { BackgroundGradient = (GradientType)Enum.Parse(typeof(GradientType), value); }
+            get
+            {
+                return BackgroundGradient.ToString();
+            }
+            set
+            {
+                BackgroundGradient = (GradientType)Enum.Parse(typeof(GradientType), value);
+            }
         }
 
         public bool Display2Rows { get; set; }    
@@ -143,18 +149,7 @@ namespace LiveSplit.UI.Components
 
         private void UpdateSettingsRadio()
         {
-            if (rdoUseLatest.Checked)
-            {
-                label4.Enabled = true;
-                nudLatestCompleted.Enabled = true;
-            }
-            else
-            {
-                label4.Enabled = false;
-                nudLatestCompleted.Enabled = false;
-            }
-
-            UseLatest = rdoUseLatest.Checked;
+            UseLatest = label4.Enabled = nudLatestCompleted.Enabled = rdoUseLatest.Checked;
             UseAverageComparison = rdoUseAvgComp.Checked;
             UseAllRuns = rdoUseAllRuns.Checked;
 

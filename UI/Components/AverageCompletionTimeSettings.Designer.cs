@@ -402,14 +402,14 @@
             this.groupBox5.Size = new System.Drawing.Size(456, 83);
             this.groupBox5.TabIndex = 40;
             this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "Settings";
+            this.groupBox5.Text = "Calculation Settings";
             // 
             // tableLayoutPanel6
             // 
             this.tableLayoutPanel6.ColumnCount = 3;
             this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 48.5623F));
             this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 51.4377F));
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 138F));
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 139F));
             this.tableLayoutPanel6.Controls.Add(this.rdoUseAvgComp, 1, 0);
             this.tableLayoutPanel6.Controls.Add(this.label4, 0, 1);
             this.tableLayoutPanel6.Controls.Add(this.nudLatestCompleted, 1, 1);
@@ -428,7 +428,7 @@
             this.rdoUseAvgComp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.rdoUseAvgComp.Location = new System.Drawing.Point(154, 3);
             this.rdoUseAvgComp.Name = "rdoUseAvgComp";
-            this.rdoUseAvgComp.Size = new System.Drawing.Size(154, 23);
+            this.rdoUseAvgComp.Size = new System.Drawing.Size(153, 23);
             this.rdoUseAvgComp.TabIndex = 1;
             this.rdoUseAvgComp.TabStop = true;
             this.rdoUseAvgComp.Text = "Use Average Comparison";
@@ -473,9 +473,9 @@
             // rdoUseAllRuns
             // 
             this.rdoUseAllRuns.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.rdoUseAllRuns.Location = new System.Drawing.Point(314, 3);
+            this.rdoUseAllRuns.Location = new System.Drawing.Point(313, 3);
             this.rdoUseAllRuns.Name = "rdoUseAllRuns";
-            this.rdoUseAllRuns.Size = new System.Drawing.Size(133, 23);
+            this.rdoUseAllRuns.Size = new System.Drawing.Size(134, 23);
             this.rdoUseAllRuns.TabIndex = 5;
             this.rdoUseAllRuns.TabStop = true;
             this.rdoUseAllRuns.Text = "Use All Runs";
