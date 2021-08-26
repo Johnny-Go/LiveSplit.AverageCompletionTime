@@ -33,6 +33,11 @@ namespace LiveSplit.UI.Components
         private AverageSegmentsComparisonGenerator AverageComparison { get; set; }
         private TimeSpan? AverageCompletionTimeValue { get; set; }
 
+        private int LatestCompleted { get; set; }
+        private bool UseLatest { get; set; }
+        private bool UseAverageComparison { get; set; }
+        private bool UseAllRuns { get; set; }
+
         public AverageCompletionTimeComponent(LiveSplitState state)
         {
             Formatter = new RegularAverageCompletionTimeTimeFormatter();
@@ -44,13 +49,17 @@ namespace LiveSplit.UI.Components
                     "Avg Time"
                 }
             };
-            Settings = new AverageCompletionTimeSettings(state);
+            Settings = new AverageCompletionTimeSettings();
             Settings.SettingsChanged += settings_SettingsChanged;
+            LatestCompleted = Settings.LatestCompleted;
+            UseLatest = Settings.UseLatest;
+            UseAverageComparison = Settings.UseAverageComparison;
+            UseAllRuns = Settings.UseAllRuns;
             state.OnReset += state_OnReset;
             CurrentState = state;
             AverageComparison = new AverageSegmentsComparisonGenerator(state.Run);
 
-            UpdateAverageCompletionTime(state);          
+            UpdateAverageCompletionTime(state);
         }
 
         private void settings_SettingsChanged(object sender, EventArgs e)
@@ -92,7 +101,7 @@ namespace LiveSplit.UI.Components
                 }
             }
             else if (Settings.UseAverageComparison)
-            {               
+            {
                 AverageComparison.Generate(method);
                 AverageCompletionTimeValue = AverageComparison.Run[run.Count - 1].Comparisons["Average Segments"][method];
             }
@@ -130,6 +139,12 @@ namespace LiveSplit.UI.Components
 
             Formatter.Accuracy = Settings.Accuracy;
 
+            if (SettingsChanged())
+            {
+                UpdateSettings();
+                UpdateAverageCompletionTime(state);
+            }
+
             InternalComponent.NameLabel.ForeColor = Settings.OverrideTextColor ? Settings.TextColor : state.LayoutSettings.TextColor;
             InternalComponent.ValueLabel.ForeColor = Settings.OverrideTimeColor ? Settings.TimeColor : state.LayoutSettings.TextColor;
 
@@ -148,10 +163,32 @@ namespace LiveSplit.UI.Components
 
             Formatter.Accuracy = Settings.Accuracy;
 
+            if (SettingsChanged())
+            {
+                UpdateSettings();
+                UpdateAverageCompletionTime(state);
+            }
+
             InternalComponent.NameLabel.ForeColor = Settings.OverrideTextColor ? Settings.TextColor : state.LayoutSettings.TextColor;
             InternalComponent.ValueLabel.ForeColor = Settings.OverrideTimeColor ? Settings.TimeColor : state.LayoutSettings.TextColor;
 
             InternalComponent.DrawVertical(g, state, width, clipRegion);
+        }
+
+        private bool SettingsChanged()
+        {
+            return LatestCompleted != Settings.LatestCompleted
+                || UseLatest != Settings.UseLatest
+                || UseAverageComparison != Settings.UseAverageComparison
+                || UseAllRuns != Settings.UseAllRuns;
+        }
+
+        private void UpdateSettings()
+        {
+            LatestCompleted = Settings.LatestCompleted;
+            UseLatest = Settings.UseLatest;
+            UseAverageComparison = Settings.UseAverageComparison;
+            UseAllRuns = Settings.UseAllRuns;
         }
 
         public XmlNode GetSettings(XmlDocument document)

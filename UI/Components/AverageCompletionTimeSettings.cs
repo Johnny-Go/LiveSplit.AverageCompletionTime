@@ -41,7 +41,7 @@ namespace LiveSplit.UI.Components
 
         public event EventHandler SettingsChanged;
 
-        public AverageCompletionTimeSettings(LiveSplitState state)
+        public AverageCompletionTimeSettings()
         {
             InitializeComponent();
 
