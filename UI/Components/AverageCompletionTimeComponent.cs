@@ -56,6 +56,7 @@ namespace LiveSplit.UI.Components
             UseAverageComparison = Settings.UseAverageComparison;
             UseAllRuns = Settings.UseAllRuns;
             state.OnReset += state_OnReset;
+            state.RunManuallyModified += state_RunModified;
             CurrentState = state;
             AverageComparison = new AverageSegmentsComparisonGenerator(state.Run);
 
@@ -68,6 +69,11 @@ namespace LiveSplit.UI.Components
         }
 
         private void state_OnReset(object sender, TimerPhase e)
+        {
+            UpdateAverageCompletionTime((LiveSplitState)sender);
+        }
+
+        void state_RunModified(object sender, EventArgs e)
         {
             UpdateAverageCompletionTime((LiveSplitState)sender);
         }
@@ -231,6 +237,7 @@ namespace LiveSplit.UI.Components
         public void Dispose()
         {
             CurrentState.OnReset -= state_OnReset;
+            CurrentState.RunManuallyModified -= state_RunModified;
         }
 
         public int GetSettingsHashCode() => Settings.GetSettingsHashCode();
