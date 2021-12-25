@@ -105,11 +105,19 @@ namespace LiveSplit.UI.Components
                 {
                     AverageCompletionTimeValue = TimeSpan.FromSeconds(totalTime.Value.TotalSeconds / completedRuns.Count());
                 }
+                else
+                {
+                    AverageCompletionTimeValue = null;
+                }
             }
             else if (Settings.UseAverageComparison)
             {
                 AverageComparison.Generate(method);
                 AverageCompletionTimeValue = AverageComparison.Run[run.Count - 1].Comparisons["Average Segments"][method];
+            }
+            else
+            {
+                AverageCompletionTimeValue = null;
             }
 
             PreviousTimingMethod = state.CurrentTimingMethod;
