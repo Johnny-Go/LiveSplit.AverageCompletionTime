@@ -33,8 +33,9 @@ namespace LiveSplit.UI.Components
         private AverageSegmentsComparisonGenerator AverageComparison { get; set; }
         private TimeSpan? AverageCompletionTimeValue { get; set; }
 
-        private int LatestCompleted { get; set; }
+        private int NumCompleted { get; set; }
         private bool UseLatest { get; set; }
+        private bool UseBest { get; set; }
         private bool UseAverageComparison { get; set; }
         private bool UseAllRuns { get; set; }
 
@@ -51,8 +52,9 @@ namespace LiveSplit.UI.Components
             };
             Settings = new AverageCompletionTimeSettings();
             Settings.SettingsChanged += settings_SettingsChanged;
-            LatestCompleted = Settings.LatestCompleted;
+            NumCompleted = Settings.NumCompleted;
             UseLatest = Settings.UseLatest;
+            UseBest = Settings.UseBest;
             UseAverageComparison = Settings.UseAverageComparison;
             UseAllRuns = Settings.UseAllRuns;
             state.OnReset += state_OnReset;
@@ -83,7 +85,7 @@ namespace LiveSplit.UI.Components
             var method = state.CurrentTimingMethod;
             var run = state.Run;
 
-            if (Settings.UseLatest || Settings.UseAllRuns)
+            if (Settings.UseLatest || Settings.UseBest || Settings.UseAllRuns)
             {
                 IEnumerable<TimeSpan?> completedRuns;
                 if (method == TimingMethod.GameTime)
@@ -95,9 +97,13 @@ namespace LiveSplit.UI.Components
                     completedRuns = run.AttemptHistory.Where(h => h.Time.RealTime != null).Select(h => h.Time.RealTime);
                 }
 
-                if (!Settings.UseAllRuns)
+                if (Settings.UseLatest)
                 {
-                    completedRuns = completedRuns.TakeLast(Settings.LatestCompleted);
+                    completedRuns = completedRuns.TakeLast(Settings.NumCompleted);
+                }
+                else if (Settings.UseBest)
+                {
+                    completedRuns = completedRuns.OrderByDescending(x => x.Value).TakeLast(Settings.NumCompleted);
                 }
 
                 var totalTime = completedRuns.DefaultIfEmpty().Aggregate((s, a) => s + a);
@@ -191,16 +197,18 @@ namespace LiveSplit.UI.Components
 
         private bool SettingsChanged()
         {
-            return LatestCompleted != Settings.LatestCompleted
+            return NumCompleted != Settings.NumCompleted
                 || UseLatest != Settings.UseLatest
+                || UseBest != Settings.UseBest
                 || UseAverageComparison != Settings.UseAverageComparison
                 || UseAllRuns != Settings.UseAllRuns;
         }
 
         private void UpdateSettings()
         {
-            LatestCompleted = Settings.LatestCompleted;
+            NumCompleted = Settings.NumCompleted;
             UseLatest = Settings.UseLatest;
+            UseBest = Settings.UseBest;
             UseAverageComparison = Settings.UseAverageComparison;
             UseAllRuns = Settings.UseAllRuns;
         }

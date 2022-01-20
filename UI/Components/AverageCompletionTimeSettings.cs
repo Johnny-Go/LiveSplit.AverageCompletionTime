@@ -34,8 +34,9 @@ namespace LiveSplit.UI.Components
 
         public LayoutMode Mode { get; set; }
         
-        public int LatestCompleted { get; set; }
+        public int NumCompleted { get; set; }
         public bool UseLatest { get; set; }
+        public bool UseBest { get; set; }
         public bool UseAllRuns { get; set; }
         public bool UseAverageComparison { get; set; }
 
@@ -55,12 +56,14 @@ namespace LiveSplit.UI.Components
             BackgroundGradient = GradientType.Plain;
             Display2Rows = false;
             UseLatest = true;
+            UseBest = false;
             UseAllRuns = false;          
             UseAverageComparison = false;
-            LatestCompleted = 100;
+            NumCompleted = 100;
             
-            nudLatestCompleted.DataBindings.Add("Value", this, "LatestCompleted", false, DataSourceUpdateMode.OnPropertyChanged);
+            nudNumCompleted.DataBindings.Add("Value", this, "NumCompleted", false, DataSourceUpdateMode.OnPropertyChanged);
             rdoUseLatest.DataBindings.Add("Checked", this, "UseLatest", false, DataSourceUpdateMode.OnPropertyChanged);
+            rdoUseBest.DataBindings.Add("Checked", this, "UseBest", false, DataSourceUpdateMode.OnPropertyChanged);
             rdoUseAllRuns.DataBindings.Add("Checked", this, "UseAllRuns", false, DataSourceUpdateMode.OnPropertyChanged);
             rdoUseAvgComp.DataBindings.Add("Checked", this, "UseAverageComparison", false, DataSourceUpdateMode.OnPropertyChanged);
             chkOverrideTextColor.DataBindings.Add("Checked", this, "OverrideTextColor", false, DataSourceUpdateMode.OnPropertyChanged);
@@ -89,8 +92,9 @@ namespace LiveSplit.UI.Components
             rdoSeconds.Checked = Accuracy == TimeAccuracy.Seconds;
             rdoTenths.Checked = Accuracy == TimeAccuracy.Tenths;
             rdoHundredths.Checked = Accuracy == TimeAccuracy.Hundredths;
-            nudLatestCompleted.Value = LatestCompleted;
+            nudNumCompleted.Value = NumCompleted;
             rdoUseLatest.Checked = UseLatest;
+            rdoUseBest.Checked = UseBest;
             rdoUseAvgComp.Checked = UseAverageComparison;
             rdoUseAllRuns.Checked = UseAllRuns;
             rdoComparisonGroup_Click(null, null);
@@ -154,7 +158,10 @@ namespace LiveSplit.UI.Components
 
         private void UpdateSettingsRadio()
         {
-            UseLatest = label4.Enabled = nudLatestCompleted.Enabled = rdoUseLatest.Checked;
+            label4.Enabled = (rdoUseLatest.Checked || rdoUseBest.Checked);
+            nudNumCompleted.Enabled = (rdoUseLatest.Checked || rdoUseBest.Checked);
+            UseLatest = rdoUseLatest.Checked;
+            UseBest = rdoUseBest.Checked;
             UseAverageComparison = rdoUseAvgComp.Checked;
             UseAllRuns = rdoUseAllRuns.Checked;
 
@@ -163,14 +170,14 @@ namespace LiveSplit.UI.Components
 
         private void nudLatestCompleted_ValueChanged(object sender, EventArgs e)
         {
-            LatestCompleted = (int)nudLatestCompleted.Value;
+            NumCompleted = (int)nudNumCompleted.Value;
             SettingsChanged(this, null);
         }
 
         public void SetSettings(XmlNode node)
         {
             var element = (XmlElement)node;
-            LatestCompleted = SettingsHelper.ParseInt(element["LatestCompleted"]);
+            NumCompleted = SettingsHelper.ParseInt(element["NumCompleted"]);
             TextColor = SettingsHelper.ParseColor(element["TextColor"]);
             OverrideTextColor = SettingsHelper.ParseBool(element["OverrideTextColor"]);
             TimeColor = SettingsHelper.ParseColor(element["TimeColor"]);
@@ -183,6 +190,7 @@ namespace LiveSplit.UI.Components
             UseAllRuns = SettingsHelper.ParseBool(element["UseAllRuns"], false);
             UseAverageComparison = SettingsHelper.ParseBool(element["UseAverageComparison"], false);
             UseLatest = SettingsHelper.ParseBool(element["UseLatest"], false);
+            UseBest = SettingsHelper.ParseBool(element["UseBest"], false);
         }
 
         public XmlNode GetSettings(XmlDocument document)
@@ -212,7 +220,8 @@ namespace LiveSplit.UI.Components
             SettingsHelper.CreateSetting(document, parent, "UseAllRuns", UseAllRuns) ^
             SettingsHelper.CreateSetting(document, parent, "UseAverageComparison", UseAverageComparison) ^
             SettingsHelper.CreateSetting(document, parent, "UseLatest", UseLatest) ^
-            SettingsHelper.CreateSetting(document, parent, "LatestCompleted", LatestCompleted);
+            SettingsHelper.CreateSetting(document, parent, "UseBest", UseBest) ^
+            SettingsHelper.CreateSetting(document, parent, "NumCompleted", NumCompleted);
         }
 
         private void ColorButtonClick(object sender, EventArgs e)
