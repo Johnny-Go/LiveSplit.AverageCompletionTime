@@ -38,6 +38,7 @@ namespace LiveSplit.UI.Components
         private bool UseBest { get; set; }
         private bool UseAverageComparison { get; set; }
         private bool UseAllRuns { get; set; }
+        private bool UseNoOutliers { get; set; }
 
         public AverageCompletionTimeComponent(LiveSplitState state)
         {
@@ -57,6 +58,7 @@ namespace LiveSplit.UI.Components
             UseBest = Settings.UseBest;
             UseAverageComparison = Settings.UseAverageComparison;
             UseAllRuns = Settings.UseAllRuns;
+            UseNoOutliers = Settings.UseNoOutliers;
             state.OnReset += state_OnReset;
             state.RunManuallyModified += state_RunModified;
             CurrentState = state;
@@ -85,7 +87,7 @@ namespace LiveSplit.UI.Components
             var method = state.CurrentTimingMethod;
             var run = state.Run;
 
-            if (Settings.UseLatest || Settings.UseBest || Settings.UseAllRuns)
+            if (Settings.UseLatest || Settings.UseBest || Settings.UseAllRuns || Settings.UseNoOutliers)
             {
                 IEnumerable<TimeSpan?> completedRuns;
                 if (method == TimingMethod.GameTime)
@@ -104,6 +106,39 @@ namespace LiveSplit.UI.Components
                 else if (Settings.UseBest)
                 {
                     completedRuns = completedRuns.OrderByDescending(x => x.Value).TakeLast(Settings.NumCompleted);
+                }
+                else if (Settings.UseNoOutliers)
+                {
+                    var count = completedRuns.Count();
+
+                    //skip if 1 or less completetd runs
+                    if (count > 1)
+                    {
+                        completedRuns = completedRuns.OrderBy(x => x);
+
+                        //calculate median
+                        var median = Median(completedRuns);
+
+                        //calculate Q1 (median for values < median)
+                        var bottomHalf = completedRuns.Take(count / 2);
+                        var q1 = Median(bottomHalf.Where(x => x.Value < median));
+
+                        //calculate Q3 (median for values > median)
+                        var topHalf = completedRuns.Skip(count / 2);
+                        var q3 = Median(topHalf.Where(x => x.Value > median));
+
+                        //calculate IQR (Q3-Q1)
+                        var iqr = (q3 - q1);
+
+                        //calculate High boundary (Q3 + (1.5 x IQR))
+                        var highBoundary = q3 + new TimeSpan((long)(1.5 * (iqr?.Ticks ?? 0)));
+
+                        //calculate Low boundary (Q1 − (1.5 x IQR))
+                        var lowBoundary = q1 - new TimeSpan((long)(1.5 * (iqr?.Ticks ?? 0)));
+
+                        //remove outliers
+                        completedRuns = completedRuns.Where(x => x.Value > lowBoundary && x.Value < highBoundary);
+                    }
                 }
 
                 var totalTime = completedRuns.DefaultIfEmpty().Aggregate((s, a) => s + a);
@@ -127,6 +162,27 @@ namespace LiveSplit.UI.Components
             }
 
             PreviousTimingMethod = state.CurrentTimingMethod;
+        }
+
+        private TimeSpan? Median(IEnumerable<TimeSpan?> list)
+        {
+            var orderedList = list.OrderBy(x => x);
+            int count = orderedList.Count();
+            TimeSpan? median = default(TimeSpan);
+            if(count % 2 != 0)
+            {
+                median = orderedList.ElementAt((count - 1) / 2);
+            }
+            else
+            {
+                var mid = count / 2;
+                var lower = orderedList.ElementAt(mid - 1);
+                var higher = orderedList.ElementAt(mid);
+                var ticksAverage = ((lower + higher)?.Ticks ?? 0) / 2;
+                median = new TimeSpan(ticksAverage);
+            }
+
+            return median;
         }
 
         private void DrawBackground(Graphics g, LiveSplitState state, float width, float height)
@@ -201,7 +257,8 @@ namespace LiveSplit.UI.Components
                 || UseLatest != Settings.UseLatest
                 || UseBest != Settings.UseBest
                 || UseAverageComparison != Settings.UseAverageComparison
-                || UseAllRuns != Settings.UseAllRuns;
+                || UseAllRuns != Settings.UseAllRuns
+                || UseNoOutliers != Settings.UseNoOutliers;
         }
 
         private void UpdateSettings()
@@ -211,6 +268,7 @@ namespace LiveSplit.UI.Components
             UseBest = Settings.UseBest;
             UseAverageComparison = Settings.UseAverageComparison;
             UseAllRuns = Settings.UseAllRuns;
+            UseNoOutliers = Settings.UseNoOutliers;
         }
 
         public XmlNode GetSettings(XmlDocument document)

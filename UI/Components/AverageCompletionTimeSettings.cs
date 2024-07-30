@@ -38,6 +38,7 @@ namespace LiveSplit.UI.Components
         public bool UseLatest { get; set; }
         public bool UseBest { get; set; }
         public bool UseAllRuns { get; set; }
+        public bool UseNoOutliers { get; set; }
         public bool UseAverageComparison { get; set; }
 
         public event EventHandler SettingsChanged;
@@ -57,7 +58,8 @@ namespace LiveSplit.UI.Components
             Display2Rows = false;
             UseLatest = true;
             UseBest = false;
-            UseAllRuns = false;          
+            UseAllRuns = false;
+            UseNoOutliers = false;
             UseAverageComparison = false;
             NumCompleted = 100;
             
@@ -65,6 +67,7 @@ namespace LiveSplit.UI.Components
             rdoUseLatest.DataBindings.Add("Checked", this, "UseLatest", false, DataSourceUpdateMode.OnPropertyChanged);
             rdoUseBest.DataBindings.Add("Checked", this, "UseBest", false, DataSourceUpdateMode.OnPropertyChanged);
             rdoUseAllRuns.DataBindings.Add("Checked", this, "UseAllRuns", false, DataSourceUpdateMode.OnPropertyChanged);
+            rdoUseNoOutliers.DataBindings.Add("Checked", this, "UseNoOutliers", false, DataSourceUpdateMode.OnPropertyChanged);
             rdoUseAvgComp.DataBindings.Add("Checked", this, "UseAverageComparison", false, DataSourceUpdateMode.OnPropertyChanged);
             chkOverrideTextColor.DataBindings.Add("Checked", this, "OverrideTextColor", false, DataSourceUpdateMode.OnPropertyChanged);
             btnTextColor.DataBindings.Add("BackColor", this, "TextColor", false, DataSourceUpdateMode.OnPropertyChanged);
@@ -97,6 +100,7 @@ namespace LiveSplit.UI.Components
             rdoUseBest.Checked = UseBest;
             rdoUseAvgComp.Checked = UseAverageComparison;
             rdoUseAllRuns.Checked = UseAllRuns;
+            rdoUseNoOutliers.Checked = UseNoOutliers;
             rdoComparisonGroup_Click(null, null);
             if (Mode == LayoutMode.Horizontal)
             {
@@ -164,6 +168,7 @@ namespace LiveSplit.UI.Components
             UseBest = rdoUseBest.Checked;
             UseAverageComparison = rdoUseAvgComp.Checked;
             UseAllRuns = rdoUseAllRuns.Checked;
+            UseNoOutliers = rdoUseNoOutliers.Checked;
 
             SettingsChanged(this, null);
         }
@@ -188,6 +193,7 @@ namespace LiveSplit.UI.Components
             GradientString = SettingsHelper.ParseString(element["BackgroundGradient"]);
             Display2Rows = SettingsHelper.ParseBool(element["Display2Rows"], false);
             UseAllRuns = SettingsHelper.ParseBool(element["UseAllRuns"], false);
+            UseNoOutliers = SettingsHelper.ParseBool(element["UseNoOutliers"], false);
             UseAverageComparison = SettingsHelper.ParseBool(element["UseAverageComparison"], false);
             UseLatest = SettingsHelper.ParseBool(element["UseLatest"], false);
             UseBest = SettingsHelper.ParseBool(element["UseBest"], false);
@@ -218,6 +224,7 @@ namespace LiveSplit.UI.Components
             SettingsHelper.CreateSetting(document, parent, "BackgroundGradient", BackgroundGradient) ^
             SettingsHelper.CreateSetting(document, parent, "Display2Rows", Display2Rows) ^
             SettingsHelper.CreateSetting(document, parent, "UseAllRuns", UseAllRuns) ^
+            SettingsHelper.CreateSetting(document, parent, "UseNoOutliers", UseNoOutliers) ^
             SettingsHelper.CreateSetting(document, parent, "UseAverageComparison", UseAverageComparison) ^
             SettingsHelper.CreateSetting(document, parent, "UseLatest", UseLatest) ^
             SettingsHelper.CreateSetting(document, parent, "UseBest", UseBest) ^
